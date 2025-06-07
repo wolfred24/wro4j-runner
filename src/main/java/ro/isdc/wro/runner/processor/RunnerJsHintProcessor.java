@@ -12,9 +12,12 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Map;
 
+import org.omg.CORBA.SystemException;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import ro.isdc.wro.extensions.processor.support.linter.LinterError;
 
 public class RunnerJsHintProcessor extends JsHintProcessor {
     public static String ALIAS = JsHintProcessor.ALIAS;
@@ -32,11 +35,31 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
     @Override
     protected void onLinterException(final LinterException e, final Resource resource) {
         // super.onLinterException(e, resource);
-        System.out.println("The following resource: " + resource + " has " + e.getErrors().size() + " errors.");
+        System.out.println("The following resource: " + (resource != null ? resource.getUri() : "null") + " has "
+                + e.getErrors().size() + " errors.");
+        System.out.println("ERRORS:");
         for (Object err : e.getErrors()) {
             String errStr = err.toString();
-            if (errStr.contains("reason")) {
-                System.out.println(err);
+            // if (errStr.contains("reason")) {
+            // // Extrae los campos manualmente del string
+            // String line = extractField(errStr, "line");
+            // String character = extractField(errStr, "character");
+            // String reason = extractField(errStr, "reason");
+            // String evidence = extractField(errStr, "evidence");
+            // System.out.println(
+            // " Line: " + line + "\n Char: " + character + "\n Reason: " + reason + "\n
+            // Code: "
+            // + evidence);
+            if (err instanceof LinterError) {
+                LinterError linterError = (LinterError) err;
+                System.out.println(
+                        "[\n Line: " + linterError.getLine() +
+                                "\n Char: " + linterError.getCharacter() +
+                                " \n Reason: " + linterError.getReason() +
+                                (linterError.getEvidence() != null && !linterError.getEvidence().isEmpty()
+                                        ? "\n Code: " + linterError.getEvidence()
+                                        : ""));
+                System.out.println("],");
             } else {
                 System.err.println(err);
             }
@@ -145,7 +168,10 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
                 Map<String, Object> optionsMap = findAndLoadJshintrc(searchDir);
                 if (optionsMap != null) {
                     options = mapToCsvOptions(optionsMap);
-                    System.out.println("[JShint] Using .jshintrc configuration in: " + searchDir.getAbsolutePath());
+                    String baseDir = System.getProperty("user.dir");
+                    String absPath = searchDir.getAbsolutePath();
+                    String shortPath = absPath.startsWith(baseDir) ? absPath.substring(baseDir.length() + 1) : absPath;
+                    System.out.println("[JShint] Using JShint configuration in: " + shortPath + "/.jshintrc");
                     System.out.println("[JShint] Options: " + options);
                 } else {
                     System.out.println("[JShint] No .jshintrc found in the hierarchy starting from: "
