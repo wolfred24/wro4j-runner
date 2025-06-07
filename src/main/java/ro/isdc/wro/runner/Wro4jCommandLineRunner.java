@@ -398,7 +398,7 @@ public class Wro4jCommandLineRunner {
                 final Map<String, ResourcePreProcessor> map = super.newPreProcessorsMap();
                 // override csslint & jsHint aliases
                 map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
-                map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
+                map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor(contextFolder));
                 return map;
             }
 
@@ -407,7 +407,7 @@ public class Wro4jCommandLineRunner {
                 final Map<String, ResourcePostProcessor> map = super.newPostProcessorsMap();
                 // override csslint & jsHint aliases
                 map.put(CssLintProcessor.ALIAS, new RunnerCssLintProcessor());
-                map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor());
+                map.put(JsHintProcessor.ALIAS, new RunnerJsHintProcessor(contextFolder));
                 return map;
             }
         }.setProperties(props);

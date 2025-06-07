@@ -18,9 +18,15 @@ import java.lang.reflect.Type;
 
 public class RunnerJsHintProcessor extends JsHintProcessor {
     public static String ALIAS = JsHintProcessor.ALIAS;
+    private final File contextFolder; // <-- AGREGA ESTA LÍNEA
+
+    public RunnerJsHintProcessor(File contextFolder) {
+        super();
+        this.contextFolder = contextFolder;
+    }
 
     public RunnerJsHintProcessor() {
-        super();
+        this(new File(System.getProperty("user.dir")));
     }
 
     @Override
@@ -58,10 +64,9 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
         if (file.exists()) {
             return file;
         }
-        String contextFolder = System.getProperty("contextFolder");
-        if (contextFolder != null) {
+        if (this.contextFolder != null) {
             String relativePath = resource.getUri().replaceFirst("^/", "");
-            file = new File(contextFolder, relativePath);
+            file = new File(this.contextFolder, relativePath);
             if (file.exists()) {
                 return file;
             }
@@ -132,9 +137,8 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
             if (resourceFile != null && resourceFile.exists()) {
                 searchDir = resourceFile.getParentFile();
             } else {
-                String contextFolder = System.getProperty("contextFolder");
-                if (contextFolder != null) {
-                    searchDir = new File(contextFolder).getAbsoluteFile();
+                if (this.contextFolder != null) {
+                    searchDir = this.contextFolder.getAbsoluteFile();
                 }
             }
             if (searchDir != null) {
