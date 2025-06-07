@@ -37,7 +37,6 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
     }
     File file = new File(resource.getUri());
     if (file.exists()) {
-      System.out.println("[JSHint][DEBUG] getResourceFile: Encontrado por ruta directa: " + file.getAbsolutePath());
       return file;
     }
     String contextFolder = System.getProperty("contextFolder");
@@ -45,13 +44,12 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
       String relativePath = resource.getUri().replaceFirst("^/", "");
       file = new File(contextFolder, relativePath);
       if (file.exists()) {
-        System.out.println("[JSHint][DEBUG] getResourceFile: Encontrado relativo a contextFolder: " + file.getAbsolutePath());
         return file;
       }
     } else {
-      System.out.println("[JSHint][DEBUG] contextFolder no definido en System properties");
-    }
-    System.out.println("[JSHint][DEBUG] getResourceFile: No se encontró archivo para resource.getUri(): " + resource.getUri());
+      System.out.println("[JSHint] contextFolder not defined in System properties");
+        }
+        System.out.println("[JSHint] getResourceFile: No file found for resource.getUri(): " + resource.getUri());
     return null;
   }
 
@@ -62,17 +60,16 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
     File dir = startDir.getAbsoluteFile(); // <-- Asegura que sea absoluto
     while (dir != null) {
       File jshintrc = new File(dir, ".jshintrc");
-      System.out.println("[JSHint][DEBUG] Revisando: " + jshintrc.getAbsolutePath());
       if (jshintrc.exists()) {
         FileReader reader = null;
         try {
           reader = new FileReader(jshintrc);
           Gson gson = new Gson();
           Type type = new TypeToken<Map<String, Object>>(){}.getType();
-          System.out.println("[JSHint][DEBUG] .jshintrc encontrado y cargado: " + jshintrc.getAbsolutePath());
+          System.out.println("[JShint] .jshintrc loaded: " + jshintrc.getAbsolutePath());
           return gson.fromJson(reader, type);
         } catch (IOException e) {
-          System.err.println("No se pudo leer .jshintrc en " + jshintrc.getAbsolutePath() + ": " + e.getMessage());
+          System.err.println("[JShint] No se pudo leer .jshintrc en " + jshintrc.getAbsolutePath() + ": " + e.getMessage());
           break;
         } finally {
           if (reader != null) {
@@ -81,7 +78,6 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
         }
       }
       dir = dir.getParentFile();
-      System.out.println("[JSHint][DEBUG] Subiendo a directorio padre: " + (dir != null ? dir.getAbsolutePath() : "null"));
     }
     return null;
   }
@@ -99,12 +95,12 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
   @Override
   public void process(final Resource resource, final Reader reader, final Writer writer)
       throws IOException {
-    System.out.println("[JSHint][DEBUG] Iniciando process para recurso: " + (resource != null ? resource.getUri() : "null"));
+    String resourceUri = (resource != null ? resource.getUri() : "null");
+    System.out.println("Processing resource: " + resourceUri);
     final String content = org.apache.commons.io.IOUtils.toString(reader);
     final AbstractLinter linter = newLinter();
     try {
       File resourceFile = getResourceFile(resource);
-      System.out.println("[JSHint][DEBUG] resourceFile: " + (resourceFile != null ? resourceFile.getAbsolutePath() : "null"));
       String options = null;
       File searchDir = null;
       if (resourceFile != null && resourceFile.exists()) {
@@ -112,41 +108,39 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
       } else {
         String contextFolder = System.getProperty("contextFolder");
         if (contextFolder != null) {
-          searchDir = new File(contextFolder).getAbsoluteFile(); // <-- AQUÍ
+          searchDir = new File(contextFolder).getAbsoluteFile();
         }
       }
       if (searchDir != null) {
-        System.out.println("[JSHint][DEBUG] Buscando .jshintrc desde: " + searchDir.getAbsolutePath());
         Map<String, Object> optionsMap = findAndLoadJshintrc(searchDir);
         if (optionsMap != null) {
           options = mapToCsvOptions(optionsMap);
-          System.out.println("[JSHint] Usando configuración de .jshintrc encontrada en jerarquía.");
-          System.out.println("[JSHint][DEBUG] Opciones CSV: " + options);
+          System.out.println("[JShint] Using .jshintrc configuration in: " + searchDir.getAbsolutePath());
+          System.out.println("[JShint] Options: " + options);
         } else {
-          System.out.println("[JSHint] No se encontró .jshintrc en la jerarquía para: " + searchDir.getAbsolutePath());
+            System.out.println("[JShint] No .jshintrc found in the hierarchy starting from: " + searchDir.getAbsolutePath());
         }
       } else {
-        System.out.println("[JSHint][DEBUG] searchDir es null, no se buscará .jshintrc");
+        System.out.println("[JShint] Could not determine the directory to search for .jshintrc");
       }
       if (options == null) {
         options = createDefaultOptions();
-        System.out.println("[JSHint][DEBUG] Usando opciones por defecto: " + options);
+        System.out.println("[JShint] using default options: " + options);
       }
       linter.setOptions(options).validate(content);
     } catch (final LinterException e) {
-      System.out.println("[JSHint][DEBUG] LinterException capturada: " + e.getMessage());
+      System.err.println("LinterException in " + resourceUri + ": " + e.getMessage());
       onLinterException(e, resource);
     } catch (final ro.isdc.wro.WroRuntimeException e) {
-      System.out.println("[JSHint][DEBUG] WroRuntimeException capturada: " + e.getMessage());
+      System.err.println("WroRuntimeException in " + resourceUri + ": " + e.getMessage());
       onException(e);
-      final String resourceUri = resource == null ? "" : "[" + resource.getUri() + "]";
-      System.err.println("Exception while applying " + getClass().getSimpleName() + " processor on the " + resourceUri
-          + " resource, no processing applied...");
+      System.err.println("Exception while applying " + getClass().getSimpleName() + " processor on the [" + resourceUri
+          + "] resource, no processing applied...");
     } finally {
       writer.write(content);
       reader.close();
       writer.close();
-      System.out.println("[JSHint][DEBUG] Finalizó process para recurso: " + (resource != null ? resource.getUri() : "null"));
+      System.out.println("Finished processing: " + resourceUri);
     }
   }
 }
