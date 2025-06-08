@@ -9,13 +9,16 @@ Command line runner for wro4j
     $ mvn clean install
 ```
 
+The compiled file will be saved at:
+    target/wro4j-runner-1.7.6.jar
+
 # How to Use wro4j-runner
 
 To use `wro4j-runner`, you need to provide a configuration file (`wro.xml`), a properties file (`wro.properties`), and optionally a `.jshintrc` file for JavaScript linting.
 
 ```
     =======================================
-    ## USAGE
+     USAGE
     =======================================
     --contextFolder PATH                          : Folder used as a root of the context relative
                                                     resources. By default this is the user current
@@ -53,6 +56,9 @@ This XML file defines your resource groups and the resources (JS/CSS files) to p
 </groups>
 ```
 
+For a complete explanation on how to use wro.xml please visit:
+https://wro4j.readthedocs.io/en/stable/WroFileFormat/
+
 ### 2. Create `wro.properties`
 
 This file configures wro4j options, such as pre-processors and output directories. Example:
@@ -63,24 +69,54 @@ targetGroups=all
 destinationFolder=dist
 ```
 
+For a complete list of available Configuration options please visit:
+https://wro4j.readthedocs.io/en/stable/ConfigurationOptions/
+
 ### 3. Create `.jshintrc` (Optional)
 
 If you want to enable JS linting, add a `.jshintrc` file with your linting rules:
 
 ```json
 {
+    "esnext": true,
+    "strict": true,
     "undef": true,
     "unused": true,
-    "browser": true
+    "eqeqeq": true,
+    "curly": true,
+    "browser": true,
+    "node": true,
+    "devel": true,
+    "asi": false,
+    "maxerr": 50,
+    "latedef": true,
+    "noarg": true,
+    "nonew": true,
+    "camelcase": true,
+    "quotmark": true,
+    "trailing": true,
+    "freeze": true,
+    "futurehostile": true,
+    "nocomma": true,
+    "varstmt": true
 }
 ```
+
+For a complete list of available options please visit:
+https://jshint.com/docs/options/
 
 ### 4. Run wro4j-runner
 
 Run the tool from the command line, specifying the configuration files:
 
 ```sh
-java -jar wro4j-runner.jar --wroFile wro.xml --contextFolder ./src/main/webapp --destinationFolder ./dist --propertiesFile wro.properties
+java -jar ../wro4j-runner-1.7.6.jar \
+    --wroFile wro.xml \
+    --contextFolder test_code_dir \
+    --postProcessors jsMin \
+    --wroConfigurationFile wro.properties \
+    --destinationFolder test_jshint_reports \
+    --minimize
 ```
 
 Adjust the paths as needed for your project structure.
