@@ -135,7 +135,6 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
         return null;
     }
 
-
     // Convierte el Map de opciones a CSV: key=value,key2=value2
     private String mapToCsvOptions(Map<String, Object> map) {
         StringBuilder sb = new StringBuilder();
@@ -151,7 +150,7 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
                     String key = gEntry.getKey();
                     String value = gEntry.getValue() != null ? gEntry.getValue().toString() : "true";
                     // System.out.println("The value of key " + key + " is " + value);
-                    if (value.equals("true") || value.equals(true) ) {
+                    if (value.equals("true") || value.equals(true)) {
                         if (!first)
                             sb.append(",");
                         sb.append("'").append(key).append("'");
@@ -178,7 +177,6 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
         if (jsHintOptions == null) {
             return originalContent;
         }
-        // Busca globals=['a','b',...]
         java.util.regex.Matcher m = java.util.regex.Pattern
             .compile("globals=\\[([^\\]]*)\\]")
             .matcher(jsHintOptions);
@@ -190,7 +188,11 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
         for (String g : globalsList.split(",")) {
             String key = g.trim().replace("'", "");
             if (!key.isEmpty()) {
-                sb.append("var ").append(key).append(" = {};\n");
+                // Solo inyecta si la global aparece en el código
+                // Usa una expresión regular para buscar la palabra completa
+                if (originalContent.matches("(?s).*\\b" + java.util.regex.Pattern.quote(key) + "\\b.*")) {
+                    sb.append("var ").append(key).append(" = {};\n");
+                }
             }
         }
         sb.append(originalContent);
@@ -246,7 +248,7 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
             }
             // Si llegamos aquí, relanza como LinterException para que el test pase
             throw new LinterException("Wrapped WroRuntimeException: " + e.getMessage(), e);
-        }finally {
+        } finally {
             writer.write(content);
             reader.close();
             writer.close();
