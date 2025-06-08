@@ -113,6 +113,7 @@ Run the tool from the command line, specifying the configuration files:
 java -jar ../wro4j-runner-1.7.6.jar \
     --wroFile wro.xml \
     --contextFolder test_code_dir \
+    --preProcessors jsHint \
     --postProcessors jsMin \
     --wroConfigurationFile wro.properties \
     --destinationFolder test_jshint_reports \
