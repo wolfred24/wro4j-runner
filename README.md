@@ -10,9 +10,10 @@ Command line runner for wro4j
 ```
 
 # How to Use wro4j-runner
-```
-    To use `wro4j-runner`, you need to provide a configuration file (`wro.xml`), a properties file (`wro.properties`), and optionally a `.jshintrc` file for JavaScript linting.
 
+To use `wro4j-runner`, you need to provide a configuration file (`wro.xml`), a properties file (`wro.properties`), and optionally a `.jshintrc` file for JavaScript linting.
+
+```
     =======================================
     ## USAGE
     =======================================
