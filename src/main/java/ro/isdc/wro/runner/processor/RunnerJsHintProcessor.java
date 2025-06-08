@@ -141,7 +141,24 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (sb.length() > 0)
                 sb.append(",");
-            sb.append(entry.getKey()).append("=").append(entry.getValue());
+            if ("globals".equals(entry.getKey()) && entry.getValue() instanceof Map) {
+                // Serializa como: globals=['com','dojo','dijit',...]
+                sb.append("globals=[");
+                Map<String, Object> globalsMap = (Map<String, Object>) entry.getValue();
+                boolean first = true;
+                for (Map.Entry<String, Object> gEntry : globalsMap.entrySet()) {
+                    String key = gEntry.getKey();
+                    String value = gEntry.getValue() != null ? gEntry.getValue().toString() : "true";
+                    if (value.equals("true")){
+                        if (!first) sb.append(",");
+                        sb.append("'").append(key).append("'");
+                        first = false;
+                    }
+                }
+                sb.append("]");
+            } else {
+                sb.append(entry.getKey()).append("=").append(entry.getValue());
+            }
         }
         return sb.toString();
     }
