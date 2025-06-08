@@ -2,12 +2,12 @@
 <groups xmlns="http://www.isdc.ro/wro">
 
   <group name="all">
-    <js>/js/*.js</js>
-    <css>/css/*.css</css>
+    <js>/**.js</js>
+    <css>/**.css</css>
   </group>
   
   <group name="oocss">
-    <css>/oocss/**.css</css>
+    <css>/**.css</css>
   </group>
   
 </groups>
