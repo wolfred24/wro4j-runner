@@ -14,6 +14,30 @@ $ mvn clean install
 
 To use `wro4j-runner`, you need to provide a configuration file (`wro.xml`), a properties file (`wro.properties`), and optionally a `.jshintrc` file for JavaScript linting.
 
+=======================================
+## USAGE
+=======================================
+ --contextFolder PATH                          : Folder used as a root of the context relative
+                                                 resources. By default this is the user current
+                                                 folder.
+ --destinationFolder PATH                      : Where to store the processed result. By default
+                                                 uses the folder named [wro].
+ --parallel                                    : Turns on the parallel preProcessing of resources.
+                                                 This value is false by default.
+ --postProcessors POST_PROCESSOR               : Comma separated list of post-processors
+ --targetGroups GROUPS                         : Comma separated value of the group names from
+                                                 wro.xml to process. If none is provided, all
+                                                 groups will be processed.
+ --wroConfigurationFile PATH_TO_WRO_PROPERTIES : The path to the wro.properties file. By default
+                                                 the configuration file is searched inse the user
+                                                 current folder.
+ --wroFile PATH_TO_WRO_XML                     : The path to the wro model file. By default the
+                                                 model is searched inse the user current folder.
+ -c (--compressor, --preProcessors) COMPRESSOR : Comma separated list of pre-processors
+ -i (--ignoreMissingResources)                 : Ignores missing resources
+ -m (--minimize)                               : Turns on the minimization by applying compressor
+
+
 ### 1. Create `wro.xml`
 
 This XML file defines your resource groups and the resources (JS/CSS files) to process. Example:
