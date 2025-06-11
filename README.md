@@ -98,7 +98,21 @@ If you want to enable JS linting, add a `.jshintrc` file with your linting rules
     "freeze": true,
     "futurehostile": true,
     "nocomma": true,
-    "varstmt": true
+    "varstmt": true,
+     "predef": { // Use predef instead of gloabals
+        "com": true,
+        "dojo": true,
+        "dijit": true,
+        "dojox": true,
+        "evo": true,
+        "ibm": true,
+        "define": true,
+        "require": true,
+        "console": true,
+        "alert": true,
+        "doh": true,
+        "load": true
+    }
 }
 ```
 
