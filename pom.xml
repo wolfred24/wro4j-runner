@@ -7,14 +7,19 @@
         <version>1.7.5</version>
     </parent>
     <artifactId>wro4j-runner</artifactId>
-    <version>1.7.6</version>
+    <version>1.7.8</version>
     <packaging>jar</packaging>
     <name>wro4j runner</name>
     <properties>
-	   <wro4j.version>1.8.0</wro4j.version>
+	   <wro4j.version>1.8.2</wro4j.version>
        <wro4j.runner.mainClass>ro.isdc.wro.runner.Wro4jCommandLineRunner</wro4j.runner.mainClass>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>wro4j-core</artifactId>
+            <version>${wro4j.version}</version>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>wro4j-extensions</artifactId>
