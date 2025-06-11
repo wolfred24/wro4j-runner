@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.omg.CORBA.SystemException;
 
@@ -141,15 +142,14 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (sb.length() > 0)
                 sb.append(",");
-            if ("globals".equals(entry.getKey()) && entry.getValue() instanceof Map) {
-                // Serializa como: globals=['com','dojo','dijit',...]
-                sb.append("globals=[");
-                Map<String, Object> globalsMap = (Map<String, Object>) entry.getValue();
+            if (entry.getValue() instanceof Map) {
+                // Generaliza: cualquier key cuyo valor sea un objeto, conviértelo a array
+                sb.append(entry.getKey()).append("=[");
+                Map<String, Object> objMap = (Map<String, Object>) entry.getValue();
                 boolean first = true;
-                for (Map.Entry<String, Object> gEntry : globalsMap.entrySet()) {
+                for (Map.Entry<String, Object> gEntry : objMap.entrySet()) {
                     String key = gEntry.getKey();
                     String value = gEntry.getValue() != null ? gEntry.getValue().toString() : "true";
-                    // System.out.println("The value of key " + key + " is " + value);
                     if (value.equals("true") || value.equals(true)) {
                         if (!first)
                             sb.append(",");
@@ -173,29 +173,55 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
         return null;
     }
 
+    private String stripComments(String code) {
+        // Elimina comentarios de bloque /* ... */
+        code = code.replaceAll("(?s)/\\*.*?\\*/", "");
+        // Elimina comentarios de línea //
+        code = code.replaceAll("(?m)//.*?$", "");
+        return code;
+    }
+
+    private String stripStrings(String code) {
+        // Elimina strings dobles y simples (no soporta backticks)
+        code = code.replaceAll("\"(?:\\\\.|[^\"\\\\])*\"", "\"\"");
+        code = code.replaceAll("'(?:\\\\.|[^'\\\\])*'", "''");
+        return code;
+    }
+
     private String getContentWithInjectedGlobals(String jsHintOptions, String originalContent) {
         if (jsHintOptions == null) {
             return originalContent;
         }
         java.util.regex.Matcher m = java.util.regex.Pattern
-            .compile("globals=\\[([^\\]]*)\\]")
-            .matcher(jsHintOptions);
+                .compile("globals=\\[([^\\]]*)\\]")
+                .matcher(jsHintOptions);
         if (!m.find()) {
             return originalContent;
         }
         String globalsList = m.group(1);
         StringBuilder sb = new StringBuilder();
+
+        // Elimina comentarios antes de buscar las globals usadas
+        String code = stripComments(originalContent);
+        code = stripStrings(code);
+
         for (String g : globalsList.split(",")) {
             String key = g.trim().replace("'", "");
             if (!key.isEmpty()) {
-                // Solo inyecta si la global aparece en el código
-                // Usa una expresión regular para buscar la palabra completa
-                if (originalContent.matches("(?s).*\\b" + java.util.regex.Pattern.quote(key) + "\\b.*")) {
+                // Busca la global como identificador independiente, ignorando strings y
+                // propiedades
+                // Coincide solo si la palabra aparece como identificador (no precedida de punto
+                // ni dentro de comillas)
+                java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(
+                        "(?<![\\w.$])" + Pattern.quote(key) + "(?![\\w$])");
+                java.util.regex.Matcher matcher = pattern.matcher(code);
+                if (matcher.find()) {
                     sb.append("var ").append(key).append(" = {};\n");
                 }
             }
         }
-        sb.append(originalContent);
+        sb.append(code);
+        System.out.println("Este es el codigo modificado: \n" + sb.toString());
         return sb.toString();
     }
 
@@ -232,7 +258,8 @@ public class RunnerJsHintProcessor extends JsHintProcessor {
                 jsHintOptions = createDefaultOptions();
                 System.out.println("[JShint] using default options: " + jsHintOptions);
             }
-            content = getContentWithInjectedGlobals(jsHintOptions, content);
+            // Inyecta las globals antes de validar
+            // content = getContentWithInjectedGlobals(jsHintOptions, content);
             linter.setOptions(jsHintOptions).validate(content);
         } catch (final LinterException e) {
             onLinterException(e, resource);
