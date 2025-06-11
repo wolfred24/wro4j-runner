@@ -1,0 +1,30 @@
+{
+    "esversion": 6,
+    "browser": true,
+    "node": true,
+    "devel": true,
+    "strict": false,
+    "undef": true,
+    "unused": true,
+    "eqeqeq": true,
+    "curly": true,
+    "camelcase": true,
+    "plusplus": false,
+    "bitwise": false,
+    "globals": {
+        "Promise": true,
+        "Map": true,
+        "Set": true,
+        "Symbol": true,
+        "WeakMap": true,
+        "WeakSet": true,
+        "Reflect": true,
+        "Proxy": true,
+        "console": true,
+        "window": true,
+        "document": true,
+        "module": true,
+        "require": true,
+        "define": true
+    }
+}
