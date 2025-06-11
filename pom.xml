@@ -7,7 +7,7 @@
         <version>1.7.5</version>
     </parent>
     <artifactId>wro4j-runner</artifactId>
-    <version>1.7.6</version>
+    <version>1.7.8</version>
     <packaging>jar</packaging>
     <name>wro4j runner</name>
     <properties>
