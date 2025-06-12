@@ -1,7 +1,7 @@
 # wro4j-runner
 
 
-Command-line runner for Wro4j. This fork revives the legacy Wro4j library, which was compatible with 32-bit Java, and updates it to restore its functionality.
+Command-line runner for Wro4j. This fork revives the legacy Wro4j library, which is compatible with 32-bit Java, and updates it to restore its functionality.
 
 # Download
 
