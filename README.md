@@ -1,9 +1,15 @@
 # wro4j-runner
 
 
-Command line runner for wro4j
+Command-line runner for Wro4j. This fork revives the legacy Wro4j library, which was compatible with 32-bit Java, and updates it to restore its functionality.
 
-# Building
+# Download
+
+You can download the latest jar file from the releases page:
+https://github.com/wolfred24/wro4j-runner/releases
+
+## Building
+If you prefer not to use the precompiled jar, you can build from source, follow these steps:
 ```
     $ git clone git@github.com:wro4j/wro4j-runner.git
     $ mvn clean install
